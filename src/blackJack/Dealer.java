@@ -9,4 +9,9 @@ public class Dealer {
 	public Dealer() {
 		
 	}
+	public void datenReset() {
+		wertKarteGes = 0;
+		wertKarteOffen = 0;
+		wertKarteVerdeckt = 0;
+	}
 }

@@ -29,15 +29,53 @@ public class Steuerung {
 	private final String busted = "Busted";
 	private final String blackJack = "Black Jack";
 	private final String dealerBusted = "Dealer busted";
-	
+
 	public Steuerung(GUI dieGui) {
 		this.dieGui = dieGui;
 		initSpiel();
 	}
 
 //---------------INIT--------------------
-	private void initSpiel() {
+	public void initSpiel() {
+		initSteuerungDaten();
+		initSpielerDaten();
+		initDealerDaten();
 		initDeck();
+		initGui();
+	}
+
+	public void spielerGeldGespeichert() {
+		for (int i = 0; i < dieSpieler.length; i++) {
+			if (dieSpieler[i] != null) {
+				int j = dieSpieler[i].geld;
+				dieSpieler[i].setGeldGespeichert(j);
+			}
+		}
+	}
+
+	private void initGui() {
+		dieGui.datenReset();
+	}
+
+	private void initSteuerungDaten() {
+		momentanerSpieler = 0;
+		id = 0;
+		dasDeck.clear();
+		dieKarten.clear();
+	}
+
+	private void initSpielerDaten() {
+		for (int i = 0; i < dieSpieler.length; i++) {
+			if (dieSpieler[i] != null) {
+				dieSpieler[i].datenReset();
+				dieSpieler[i].initGeld();
+			}
+		}
+	}
+
+	private void initDealerDaten() {
+		if (derDealer != null)
+			derDealer.datenReset();
 	}
 
 	private void initDeck() {
@@ -75,21 +113,29 @@ public class Steuerung {
 	public void austeilen(ArrayList<JTextField> tfSKarten, JTextField tfDKarten) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < dieSpieler.length; j++) {
-				dieSpieler[j].kartenWertGes = dasDeck.get(0).getWert();
+				dieSpieler[j].kartenWertGes += dasDeck.get(0).getWert();
 				dieSpieler[j].kartenBekommen++;
 				tfSKarten.get(j).setText(" " + dieSpieler[j].kartenWertGes + " ");
 				dasDeck.remove(0);
+				dieGui.deckUpdate();
+
+				if (dieSpieler[j].kartenBekommen == 2 && dieSpieler[j].kartenWertGes == BLACKJACK) {
+					dieGui.tfStatusSpieler.get(momentanerSpieler).setText(blackJack);
+					momentanerSpieler++;
+				}
 			}
 			if (i == 0) {
-				derDealer.wertKarteGes = dasDeck.get(0).getWert();
+				derDealer.wertKarteGes += dasDeck.get(0).getWert();
 				derDealer.wertKarteOffen = dasDeck.get(0).getWert();
 				tfDKarten.setText(" " + derDealer.wertKarteOffen + " ");
 				dasDeck.remove(0);
+				dieGui.deckUpdate();
 			}
 			if (i == 1) {
-				derDealer.wertKarteGes = dasDeck.get(0).getWert();
+				derDealer.wertKarteGes += dasDeck.get(0).getWert();
 				derDealer.wertKarteVerdeckt = dasDeck.get(0).getWert();
 				dasDeck.remove(0);
+				dieGui.deckUpdate();
 			}
 		}
 	}
@@ -116,6 +162,14 @@ public class Steuerung {
 
 	}
 
+	public int getMomentanesSpielerGeld() {
+		int i = 0;
+		if (momentanerSpieler < 3)
+			i = dieSpieler[momentanerSpieler].geld;
+
+		return i;
+	}
+
 //-------------Actions-------------------
 	public void setzen(ArrayList<JTextField> tfEinsatzA, int einsatz) {
 
@@ -128,20 +182,15 @@ public class Steuerung {
 		dieSpieler[momentanerSpieler].kartenWertGes += dasDeck.get(0).getWert();
 		dasDeck.remove(0);
 		anzeigen();
+		dieGui.deckUpdate();
+
 		if (dieSpieler[momentanerSpieler].kartenWertGes > BLACKJACK) {
 			dieGui.tfStatusSpieler.get(momentanerSpieler).setText(busted);
 			momentanerSpieler++;
 			if (momentanerSpieler >= 4) {
 				showDown();
 			}
-		} else if (dieSpieler[momentanerSpieler].kartenWertGes == BLACKJACK && dieSpieler[momentanerSpieler].kartenBekommen == 2) {
-			dieGui.tfStatusSpieler.get(momentanerSpieler).setText(blackJack);
-			momentanerSpieler++;
-			if (momentanerSpieler >= 4) {
-				showDown();
-			}
 		}
-
 	}
 
 }

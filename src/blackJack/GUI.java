@@ -12,6 +12,7 @@ import javax.swing.JTextField;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.awt.event.ActionListener;
@@ -67,6 +68,7 @@ public class GUI {
 				try {
 					GUI window = new GUI();
 					window.frame.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -96,7 +98,7 @@ public class GUI {
 		JPanel pAction = new JPanel();
 		frame.getContentPane().add(pAction, BorderLayout.SOUTH);
 
-		JButton btVersicherung = new JButton("Verischerung");
+		JButton btVersicherung = new JButton("Versicherung");
 		btVersicherung.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -514,11 +516,13 @@ public class GUI {
 
 				if (dieSteuerung.momentanerSpieler <= 3 && dieSteuerung.dieSpieler[dieSteuerung.momentanerSpieler].einsatz != 0) {
 					dieSteuerung.momentanerSpieler++;
+					anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
 				} else if (dieSteuerung.momentanerSpieler > 3) {
 					state = "austeilen";
 					btNaechsterSpieler.setEnabled(false);
 					dieSteuerung.austeilen(tfSpielerKarten, tfKartenWertD);
 					dieSteuerung.momentanerSpieler = 0;
+					anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
 				}
 
 			}
@@ -548,6 +552,7 @@ public class GUI {
 					btSpielStarten.setEnabled(false);
 					btNaechsterSpieler.setEnabled(true);
 					state = "setzen";
+					anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
 				}
 			}
 		});
@@ -557,12 +562,19 @@ public class GUI {
 		JButton btNeuesSpiel = new JButton("Neues Spiel");
 		btNeuesSpiel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				btSpielStarten.setEnabled(true);
+				dieSteuerung.initSpiel();
 			}
 		});
 		pTools.add(btNeuesSpiel);
 
 		JButton btSpielBeenden = new JButton("Spiel beenden");
+		btSpielBeenden.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dieSteuerung.spielerGeldGespeichert();
+				frame.dispose();
+			}
+		});
 		pTools.add(btSpielBeenden);
 
 		JPanel pVerlauf = new JPanel();
@@ -590,5 +602,34 @@ public class GUI {
 
 	public ArrayList<JTextField> getTfSpielerKarten() {
 		return tfSpielerKarten;
+	}
+	public void deckUpdate() {
+		if(tfDeck != null)
+		tfDeck.setText("Deck: "+dieSteuerung.dasDeck.size()+" ");
+	}
+	public void datenReset() {
+		state = "default";
+		spielStart = true;
+		
+		for (JTextField jTextField : tfSpielerEinsatz) {
+			jTextField.setText("");
+		}
+		for (JTextField jTextField : tfSpielerKarten) {
+			jTextField.setText("");
+		}
+		for (JTextField jTextField : tfStatusSpieler) {
+			jTextField.setText("");
+		}
+		if (tfKartenWertD != null)
+		tfKartenWertD.setText("");
+		
+		if(tfErgebnisSpiel != null)
+		tfErgebnisSpiel.setText("");
+		
+		if(tfDeck != null)
+		tfDeck.setText("Deck: "+dieSteuerung.dasDeck.size()+" ");
+	}
+	public void anzeigenGeld(int geld) {
+		tfGeld.setText("Geld: "+geld);
 	}
 }
