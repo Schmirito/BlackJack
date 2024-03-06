@@ -35,10 +35,10 @@ public class GUI {
 	public ArrayList<JTextField> tfSpieler = new ArrayList<>();
 	public ArrayList<JButton> btSetzen = new ArrayList<>();
 	public ArrayList<JButton> btAction = new ArrayList<>();
-	public ArrayList<String> namen = new ArrayList<>();
 	ArrayList<Integer> geld = new ArrayList<>();
 	public JButton btNeueSpieler;
-
+	public JButton btNaechsterSpieler;
+	
 	public boolean spielStart = true;
 	static public boolean spielBeendet = false;
 
@@ -60,7 +60,7 @@ public class GUI {
 	private JTextField tfStatusS3;
 	private JTextField tfStatusS4;
 	public JTextField tfErgebnisSpiel;
-	private JTextField tfAktiverSpieler;
+	public JTextField tfAktiverSpieler;
 
 	/**
 	 * Launch the application.
@@ -118,6 +118,7 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				if (dieSteuerung.momentanerSpieler < 3) {
 					dieSteuerung.momentanerSpieler++;
+					anzeigenMomSpieler();
 					dieSteuerung.anzeigenGeldSteuerung();
 				} else if (state == "austeilen") {
 					state = "showDown";
@@ -137,6 +138,7 @@ public class GUI {
 				dieSteuerung.doubleDown();
 				dieSteuerung.anzeigenGeldSteuerung();
 				tfAktiverSpieler.setText("Mom. Spieler: " + tfSpieler.get(dieSteuerung.momentanerSpieler).getText());
+				anzeigenMomSpieler();
 			}
 		});
 		pAction.add(btDouble);
@@ -149,6 +151,7 @@ public class GUI {
 				if (dieSteuerung.momentanerSpieler < 4 && state == "austeilen") {
 					dieSteuerung.neueKarte();
 					dieSteuerung.anzeigenGeldSteuerung();
+					anzeigenMomSpieler();
 				} else {
 					state = "showDown";
 					dieSteuerung.momentanerSpieler = 0;
@@ -544,7 +547,7 @@ public class GUI {
 		JPanel pTools = new JPanel();
 		frame.getContentPane().add(pTools, BorderLayout.NORTH);
 
-		JButton btNaechsterSpieler = new JButton("Naechster Spieler");
+		btNaechsterSpieler = new JButton("Naechster Spieler");
 		if (spielStart) {
 			btNaechsterSpieler.setEnabled(false);
 		}
@@ -657,6 +660,7 @@ public class GUI {
 				datenReset();
 				dieSteuerung.momentanerSpieler = 0;
 				dieSteuerung.derDealer.datenReset();
+				anzeigenGeld(dieSteuerung.momentanerSpieler);
 				for (int i = 0; i < dieSteuerung.dieSpieler.size(); i++) {
 					dieSteuerung.dieSpieler.get(i).datenReset();
 				}
@@ -741,6 +745,8 @@ public class GUI {
 	}
 
 	public void neueNutzerGUI(boolean aktiv) {
+		dieSteuerung.setGeldSTARTGELD();
+		
 		tfSpieler1.setEditable(aktiv);
 		tfSpieler2.setEditable(aktiv);
 		tfSpieler3.setEditable(aktiv);
@@ -748,4 +754,10 @@ public class GUI {
 
 		btNeueSpieler.setEnabled(!aktiv);
 	}
+
+	public void anzeigenMomSpieler() {
+		tfAktiverSpieler.setText("Mom. Spieler: " + tfSpieler.get(dieSteuerung.momentanerSpieler).getText());
+		
+	}
+	
 }

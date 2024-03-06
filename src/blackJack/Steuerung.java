@@ -146,7 +146,7 @@ public class Steuerung {
 				dieGui.tfStatusSpieler.get(i).setText(won);
 			}
 			dieSpieler.get(i).setStatus();
-			
+
 		}
 	}
 
@@ -181,6 +181,12 @@ public class Steuerung {
 			dieGui.tfSpielerKarten.get(i).setText(" " + dieSpieler.get(i).kartenWertGes + " ");
 		}
 
+	}
+
+	public void setGeldSTARTGELD() {
+		for (int i = 0; i < dieSpieler.size(); i++) {
+			dieSpieler.get(i).geld = STARTGELD;
+		}
 	}
 
 	public void anzeigenEinsatz() {
@@ -231,7 +237,7 @@ public class Steuerung {
 
 	public void neueNutzer() {
 		for (int i = 0; i < dieSpieler.size(); i++) {
-			
+
 			dieSpieler.get(i).geld = STARTGELD;
 			initSpielerDaten();
 		}
@@ -274,7 +280,7 @@ public class Steuerung {
 			}
 		}
 		dieGui.anzeigenGeld(dieSpieler.get(momentanerSpieler).geld);
-		
+
 	}
 
 	public int getMomentanesSpielerGeld() {
@@ -302,6 +308,20 @@ public class Steuerung {
 			dieSpieler.get(momentanerSpieler).einsatz += einsatz;
 			anzeigenGeldSteuerung();
 			tfEinsatzA.get(momentanerSpieler).setText(" " + dieSpieler.get(momentanerSpieler).einsatz + " ");
+		}
+		if (dieSpieler.get(momentanerSpieler).geld == 0) {
+			if (momentanerSpieler < 3)
+				momentanerSpieler++;
+			else {
+				momentanerSpieler = 0;
+			austeilen(dieGui.tfSpielerKarten, dieGui.tfKartenWertD);
+			dieGui.state = "austeilen";
+			dieGui.setActionButtonEnable(true);
+			}
+			
+				
+			dieGui.anzeigenGeld(dieSpieler.get(momentanerSpieler).geld);
+			dieGui.anzeigenMomSpieler();
 		}
 	}
 
