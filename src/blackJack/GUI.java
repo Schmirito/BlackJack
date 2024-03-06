@@ -12,13 +12,9 @@ import javax.swing.JTextField;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.Window;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputMethodListener;
-import java.awt.event.InputMethodEvent;
 
 public class GUI {
 
@@ -36,10 +32,16 @@ public class GUI {
 	public ArrayList<JTextField> tfSpielerEinsatz = new ArrayList<>();
 	public ArrayList<JTextField> tfSpielerKarten = new ArrayList<>();
 	public ArrayList<JTextField> tfStatusSpieler = new ArrayList<>();
+	public ArrayList<JTextField> tfSpieler = new ArrayList<>();
+	public ArrayList<JButton> btSetzen = new ArrayList<>();
+	public ArrayList<JButton> btAction = new ArrayList<>();
+	public ArrayList<String> namen = new ArrayList<>();
+	ArrayList<Integer> geld = new ArrayList<>();
+	public JButton btNeueSpieler;
 
 	public boolean spielStart = true;
 	static public boolean spielBeendet = false;
-	
+
 	public String state = "default";
 
 	private JTextField tfEinsatzS1;
@@ -58,6 +60,7 @@ public class GUI {
 	private JTextField tfStatusS3;
 	private JTextField tfStatusS4;
 	public JTextField tfErgebnisSpiel;
+	private JTextField tfAktiverSpieler;
 
 	/**
 	 * Launch the application.
@@ -68,7 +71,7 @@ public class GUI {
 				try {
 					GUI window = new GUI();
 					window.frame.setVisible(true);
-					
+					window.frame.setLocationRelativeTo(null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -99,45 +102,58 @@ public class GUI {
 		frame.getContentPane().add(pAction, BorderLayout.SOUTH);
 
 		JButton btVersicherung = new JButton("Versicherung");
+		btAction.add(btVersicherung);
+		btVersicherung.setEnabled(false);
 		btVersicherung.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				dieSteuerung.anzeigenGeldSteuerung();
 			}
 		});
 		pAction.add(btVersicherung);
 
 		JButton btStand = new JButton("Stand");
+		btAction.add(btStand);
+		btStand.setEnabled(false);
 		btStand.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (dieSteuerung.momentanerSpieler < 3) {
 					dieSteuerung.momentanerSpieler++;
+					dieSteuerung.anzeigenGeldSteuerung();
 				} else if (state == "austeilen") {
 					state = "showDown";
 					dieSteuerung.showDown();
 					dieSteuerung.momentanerSpieler = 0;
 				}
-
+				tfAktiverSpieler.setText("Mom. Spieler: " + tfSpieler.get(dieSteuerung.momentanerSpieler).getText());
 			}
 		});
 		pAction.add(btStand);
 
 		JButton btDouble = new JButton("Double");
+		btAction.add(btDouble);
+		btDouble.setEnabled(false);
 		btDouble.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				dieSteuerung.doubleDown();
+				dieSteuerung.anzeigenGeldSteuerung();
+				tfAktiverSpieler.setText("Mom. Spieler: " + tfSpieler.get(dieSteuerung.momentanerSpieler).getText());
 			}
 		});
 		pAction.add(btDouble);
 
 		JButton btHit = new JButton("Hit");
+		btAction.add(btHit);
+		btHit.setEnabled(false);
 		btHit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (dieSteuerung.momentanerSpieler < 4 && state == "austeilen") {
 					dieSteuerung.neueKarte();
-				} else if (state == "austeilen") {
+					dieSteuerung.anzeigenGeldSteuerung();
+				} else {
 					state = "showDown";
-					dieSteuerung.showDown();
 					dieSteuerung.momentanerSpieler = 0;
+					dieSteuerung.showDown();
+					tfAktiverSpieler.setText("Mom. Spieler: " + tfSpieler.get(dieSteuerung.momentanerSpieler).getText());
 				}
 			}
 		});
@@ -166,6 +182,7 @@ public class GUI {
 		tfSetzen.setColumns(10);
 
 		JButton btFuenf = new JButton("5");
+		btSetzen.add(btFuenf);
 		btFuenf.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -181,6 +198,7 @@ public class GUI {
 		pSetzen.add(btFuenf, gbc_btFuenf);
 
 		JButton btZehn = new JButton("10");
+		btSetzen.add(btZehn);
 		btZehn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -196,6 +214,7 @@ public class GUI {
 		pSetzen.add(btZehn, gbc_btZehn);
 
 		JButton btFuenfUndZwanzig = new JButton("25");
+		btSetzen.add(btFuenfUndZwanzig);
 		btFuenfUndZwanzig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -211,6 +230,7 @@ public class GUI {
 		pSetzen.add(btFuenfUndZwanzig, gbc_btFuenfUndZwanzig);
 
 		JButton btFuenfzig = new JButton("50");
+		btSetzen.add(btFuenfzig);
 		btFuenfzig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -226,6 +246,7 @@ public class GUI {
 		pSetzen.add(btFuenfzig, gbc_btFuenfzig);
 
 		JButton btHundert = new JButton("100");
+		btSetzen.add(btHundert);
 		btHundert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -241,6 +262,7 @@ public class GUI {
 		pSetzen.add(btHundert, gbc_btHundert);
 
 		JButton btZweihundertFuenfzig = new JButton("250");
+		btSetzen.add(btZweihundertFuenfzig);
 		btZweihundertFuenfzig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -256,6 +278,7 @@ public class GUI {
 		pSetzen.add(btZweihundertFuenfzig, gbc_btZweihundertFuenfzig);
 
 		JButton btFuenfHundert = new JButton("500");
+		btSetzen.add(btFuenfHundert);
 		btFuenfHundert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -271,6 +294,7 @@ public class GUI {
 		pSetzen.add(btFuenfHundert, gbc_btFuenfHundert);
 
 		JButton btTausend = new JButton("1.000");
+		btSetzen.add(btTausend);
 		btTausend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -286,6 +310,7 @@ public class GUI {
 		pSetzen.add(btTausend, gbc_btTausend);
 
 		JButton btZweiTausendFuenfHundert = new JButton("2.500");
+		btSetzen.add(btZweiTausendFuenfHundert);
 		btZweiTausendFuenfHundert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -302,6 +327,7 @@ public class GUI {
 		pSetzen.add(btZweiTausendFuenfHundert, gbc_btZweiTausendFuenfHundert);
 
 		JButton btFuenfTausend = new JButton("5.000");
+		btSetzen.add(btFuenfTausend);
 		btFuenfTausend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (state == "setzen") {
@@ -316,6 +342,8 @@ public class GUI {
 		gbc_btFuenfTausend.gridx = 0;
 		gbc_btFuenfTausend.gridy = 10;
 		pSetzen.add(btFuenfTausend, gbc_btFuenfTausend);
+
+		setzenButtonEnable(btSetzen, false);
 
 		JPanel pMain = new JPanel();
 		frame.getContentPane().add(pMain, BorderLayout.CENTER);
@@ -346,6 +374,7 @@ public class GUI {
 		tfDeck.setColumns(10);
 
 		tfSpieler1 = new JTextField();
+		tfSpieler.add(tfSpieler1);
 		tfSpieler1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -358,6 +387,7 @@ public class GUI {
 		tfSpieler1.setColumns(10);
 
 		tfSpieler2 = new JTextField();
+		tfSpieler.add(tfSpieler2);
 		tfSpieler2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -376,6 +406,7 @@ public class GUI {
 			}
 		});
 		tfSpieler3.setText("Teilnehmen");
+		tfSpieler.add(tfSpieler3);
 		tfSpieler3.setHorizontalAlignment(SwingConstants.CENTER);
 		tfSpieler3.setBounds(289, 271, 77, 20);
 		pMain.add(tfSpieler3);
@@ -388,6 +419,7 @@ public class GUI {
 			}
 		});
 		tfSpieler4.setText("Teilnehmen");
+		tfSpieler.add(tfSpieler4);
 		tfSpieler4.setHorizontalAlignment(SwingConstants.CENTER);
 		tfSpieler4.setBounds(405, 218, 77, 20);
 		pMain.add(tfSpieler4);
@@ -503,6 +535,12 @@ public class GUI {
 		pMain.add(tfErgebnisSpiel);
 		tfErgebnisSpiel.setColumns(10);
 
+		tfAktiverSpieler = new JTextField();
+		tfAktiverSpieler.setText("Mom. Spieler: ");
+		tfAktiverSpieler.setBounds(10, 314, 124, 20);
+		pMain.add(tfAktiverSpieler);
+		tfAktiverSpieler.setColumns(10);
+
 		JPanel pTools = new JPanel();
 		frame.getContentPane().add(pTools, BorderLayout.NORTH);
 
@@ -514,17 +552,26 @@ public class GUI {
 		btNaechsterSpieler.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				if (dieSteuerung.momentanerSpieler <= 3 && dieSteuerung.dieSpieler[dieSteuerung.momentanerSpieler].einsatz != 0) {
+				if (dieSteuerung.momentanerSpieler < 4
+						&& dieSteuerung.dieSpieler.get(dieSteuerung.momentanerSpieler).einsatz != 0) {
 					dieSteuerung.momentanerSpieler++;
 					anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
-				} else if (dieSteuerung.momentanerSpieler > 3) {
-					state = "austeilen";
-					btNaechsterSpieler.setEnabled(false);
-					dieSteuerung.austeilen(tfSpielerKarten, tfKartenWertD);
-					dieSteuerung.momentanerSpieler = 0;
-					anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
-				}
 
+					if (dieSteuerung.momentanerSpieler >= 4) {
+						state = "austeilen";
+
+						btNaechsterSpieler.setEnabled(false);
+						btDouble.setEnabled(true);
+						btHit.setEnabled(true);
+						btVersicherung.setEnabled(true);
+						btStand.setEnabled(true);
+
+						dieSteuerung.austeilen(tfSpielerKarten, tfKartenWertD);
+						dieSteuerung.momentanerSpieler = 0;
+						anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
+					}
+				}
+				tfAktiverSpieler.setText("Mom. Spieler: " + tfSpieler.get(dieSteuerung.momentanerSpieler).getText());
 			}
 
 		});
@@ -532,12 +579,43 @@ public class GUI {
 		JButton btSpielStarten = new JButton("Spiel starten");
 		btSpielStarten.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (spielStart) {
+				if (!spielStart) {
+					geld.clear();
+					for (int i = 0; i < dieSteuerung.dieSpieler.size(); i++)
+						geld.add(dieSteuerung.dieSpieler.get(i).geld);
+
+					dieSteuerung.dieSpieler.clear();
 					for (int i = 0; i < tfSpielerEinsatz.size(); i++) {
+
+						String name = tfSpieler.get(i).getText();
+						dieSteuerung.hinzufuegenSpieler(name, geld.get(i));
+
+					}
+					
+					tfSpieler1.setEditable(false);
+					tfSpieler2.setEditable(false);
+					tfSpieler3.setEditable(false);
+					tfSpieler4.setEditable(false);
+
+					btSpielStarten.setEnabled(false);
+					btNaechsterSpieler.setEnabled(true);
+					state = "setzen";
+					anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
+
+					setzenButtonEnable(btSetzen, true);
+
+					if (btNeueSpieler != null)
+						btNeueSpieler.setEnabled(false);
+				}
+
+				if (spielStart) {
+
+					for (int i = 0; i < tfSpielerEinsatz.size(); i++) {
+
 						String name = tfSpielerEinsatz.get(i).getText();
 						if (name != "Teilnehmen") {
-							dieSteuerung.hinzufuegenSpieler(name);
-						} else {
+							dieSteuerung.hinzufuegenSpieler(name, dieSteuerung.STARTGELD);
+						} else if (name == "Teilnehmen") {
 							dieSteuerung.id++;
 						}
 					}
@@ -553,9 +631,21 @@ public class GUI {
 					btNaechsterSpieler.setEnabled(true);
 					state = "setzen";
 					anzeigenGeld(dieSteuerung.getMomentanesSpielerGeld());
+
+					setzenButtonEnable(btSetzen, true);
 				}
+				tfAktiverSpieler.setText("Mom. Spieler: " + tfSpieler.get(dieSteuerung.momentanerSpieler).getText());
+				btNeueSpieler.setEnabled(false);
 			}
 		});
+
+		btNeueSpieler = new JButton("Neue Spieler");
+		btNeueSpieler.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				neueNutzerGUI(true);
+			}
+		});
+		pTools.add(btNeueSpieler);
 		pTools.add(btSpielStarten);
 		pTools.add(btNaechsterSpieler);
 
@@ -563,7 +653,14 @@ public class GUI {
 		btNeuesSpiel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btSpielStarten.setEnabled(true);
-				dieSteuerung.initSpiel();
+				btNeueSpieler.setEnabled(true);
+				datenReset();
+				dieSteuerung.momentanerSpieler = 0;
+				dieSteuerung.derDealer.datenReset();
+				for (int i = 0; i < dieSteuerung.dieSpieler.size(); i++) {
+					dieSteuerung.dieSpieler.get(i).datenReset();
+				}
+
 			}
 		});
 		pTools.add(btNeuesSpiel);
@@ -600,17 +697,14 @@ public class GUI {
 
 	}
 
-	public ArrayList<JTextField> getTfSpielerKarten() {
-		return tfSpielerKarten;
-	}
 	public void deckUpdate() {
-		if(tfDeck != null)
-		tfDeck.setText("Deck: "+dieSteuerung.dasDeck.size()+" ");
+		if (tfDeck != null)
+			tfDeck.setText("Deck: " + dieSteuerung.dasDeck.size() + " ");
 	}
+
 	public void datenReset() {
 		state = "default";
-		spielStart = true;
-		
+
 		for (JTextField jTextField : tfSpielerEinsatz) {
 			jTextField.setText("");
 		}
@@ -621,15 +715,37 @@ public class GUI {
 			jTextField.setText("");
 		}
 		if (tfKartenWertD != null)
-		tfKartenWertD.setText("");
-		
-		if(tfErgebnisSpiel != null)
-		tfErgebnisSpiel.setText("");
-		
-		if(tfDeck != null)
-		tfDeck.setText("Deck: "+dieSteuerung.dasDeck.size()+" ");
+			tfKartenWertD.setText("");
+
+		if (tfErgebnisSpiel != null)
+			tfErgebnisSpiel.setText("");
+
+		if (tfDeck != null)
+			tfDeck.setText("Deck: " + dieSteuerung.dasDeck.size() + " ");
 	}
+
 	public void anzeigenGeld(int geld) {
-		tfGeld.setText("Geld: "+geld);
+		tfGeld.setText("Geld: " + geld);
+	}
+
+	public void setzenButtonEnable(ArrayList<JButton> btSetzen, boolean aktiv) {
+		for (JButton jButton : btSetzen) {
+			jButton.setEnabled(aktiv);
+		}
+	}
+
+	public void setActionButtonEnable(boolean aktiv) {
+		for (JButton jButton : btAction) {
+			jButton.setEnabled(aktiv);
+		}
+	}
+
+	public void neueNutzerGUI(boolean aktiv) {
+		tfSpieler1.setEditable(aktiv);
+		tfSpieler2.setEditable(aktiv);
+		tfSpieler3.setEditable(aktiv);
+		tfSpieler4.setEditable(aktiv);
+
+		btNeueSpieler.setEnabled(!aktiv);
 	}
 }

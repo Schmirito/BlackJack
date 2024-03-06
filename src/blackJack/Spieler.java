@@ -10,6 +10,9 @@ public class Spieler {
 	public int kartenBekommen = 0;
 	public boolean gewonnen;
 	public int gespeicherterGeldWert;
+	public boolean doubleDown = false;
+	public int karteDoubleDown = 0;
+	public String status = "default";
 	
 	public Spieler(int id,String name,int startGeld) {
 		this.id = id;
@@ -22,6 +25,12 @@ public class Spieler {
 		einsatz = 0;
 		kartenWertGes = 0;
 		kartenBekommen = 0;
+		doubleDown = false;
+		karteDoubleDown = 0;
+		status = "";
+	}
+	public void setGewonnen(boolean status) {
+		gewonnen = status;
 	}
 	public void initGeld() {
 		geld = gespeicherterGeldWert;
@@ -29,7 +38,16 @@ public class Spieler {
 	public void setGeldGespeichert(int gespeicherterWert) {
 		geld = gespeicherterWert;
 	}
-	public void setGewonnen() {
-		
+	public void setStatus() {
+		switch (status) {
+		case "Busted":
+			status = "Lost";
+			break;
+		case "Won":
+			setGewonnen(true);
+			break;
+		default:
+			break;
+		}
 	}
 }
