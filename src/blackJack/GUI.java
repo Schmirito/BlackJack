@@ -539,6 +539,7 @@ public class GUI {
 		tfErgebnisSpiel.setColumns(10);
 
 		tfAktiverSpieler = new JTextField();
+		tfAktiverSpieler.setEditable(false);
 		tfAktiverSpieler.setText("Mom. Spieler: ");
 		tfAktiverSpieler.setBounds(10, 314, 124, 20);
 		pMain.add(tfAktiverSpieler);
