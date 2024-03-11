@@ -8,6 +8,9 @@ public class Spieler {
 	public int einsatz = 0;
 	public int kartenWertGes = 0;
 	public int kartenBekommen = 0;
+	public boolean assBekommen = false;
+	public int asseInsgesamt = 0;
+	public int kartenWertMitAss = 0;
 	public boolean gewonnen;
 	public int gespeicherterGeldWert;
 	public boolean doubleDown = false;

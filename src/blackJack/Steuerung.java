@@ -178,7 +178,11 @@ public class Steuerung {
 
 	public void anzeigenKarten() {
 		for (int i = 0; i < dieSpieler.size(); i++) {
-			dieGui.tfSpielerKarten.get(i).setText(" " + dieSpieler.get(i).kartenWertGes + " ");
+			if (dieSpieler.get(i).assBekommen && dieSpieler.get(i).kartenWertGes + 10 <= 21) {
+				dieSpieler.get(i).kartenWertMitAss = dieSpieler.get(i).kartenWertGes + 10;
+				dieGui.tfSpielerKarten.get(i).setText(" " + dieSpieler.get(i).kartenWertGes + " / " + dieSpieler.get(i).kartenWertMitAss);
+			} else
+				dieGui.tfSpielerKarten.get(i).setText(" " + dieSpieler.get(i).kartenWertGes + " ");
 		}
 
 	}
@@ -199,40 +203,56 @@ public class Steuerung {
 
 	public void austeilen(ArrayList<JTextField> tfSKarten, JTextField tfDKarten) {
 		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < dieSpieler.size(); j++) {
-				dieSpieler.get(j).kartenWertGes += dasDeck.get(0).getWert();
-				dieSpieler.get(j).kartenBekommen++;
-				tfSKarten.get(j).setText(" " + dieSpieler.get(j).kartenWertGes + " ");
-				dasDeck.remove(0);
-				dieGui.deckUpdate();
+			if (dasDeck.size() != 0) {
+				for (int j = 0; j < dieSpieler.size(); j++) {
+					if (dasDeck.size() != 0 && dieSpieler.get(j).id == j) {
+						dieSpieler.get(j).kartenWertGes += dasDeck.get(0).getWert();
+						dieSpieler.get(j).kartenBekommen++;
+						if (dasDeck.get(0).getBezeichnung() == "Ass") {
+							dieSpieler.get(j).assBekommen = true;
+							dieSpieler.get(j).asseInsgesamt++;
+						}
+						tfSKarten.get(j).setText(" " + dieSpieler.get(j).kartenWertGes + " ");
+						dasDeck.remove(0);
+						dieGui.deckUpdate();
 
-				if (dieSpieler.get(j).kartenBekommen == 2 && dieSpieler.get(j).kartenWertGes == BLACKJACK) {
-					dieGui.tfStatusSpieler.get(momentanerSpieler).setText(blackJack);
-					dieSpieler.get(j).status = blackJack;
-					momentanerSpieler++;
+						if (dieSpieler.get(j).kartenBekommen == 2 && dieSpieler.get(j).kartenWertGes == BLACKJACK) {
+							dieGui.tfStatusSpieler.get(momentanerSpieler).setText(blackJack);
+							dieSpieler.get(j).status = blackJack;
+							momentanerSpieler++;
+						}
+					} else {
+						initDeck();
+						j--;
+					}
 				}
-			}
-			if (i == 0) {
-				derDealer.wertKarteGes += dasDeck.get(0).getWert();
-				derDealer.wertKarteOffen = dasDeck.get(0).getWert();
-				derDealer.kartenBekommen++;
-				tfDKarten.setText(" " + derDealer.wertKarteOffen + " ");
-				dasDeck.remove(0);
-				dieGui.deckUpdate();
-			}
-			if (i == 1) {
-				derDealer.wertKarteGes += dasDeck.get(0).getWert();
-				derDealer.wertKarteVerdeckt = dasDeck.get(0).getWert();
-				derDealer.kartenBekommen++;
-				dasDeck.remove(0);
-				dieGui.deckUpdate();
+				if (i == 0) {
+					derDealer.wertKarteGes += dasDeck.get(0).getWert();
+					derDealer.wertKarteOffen = dasDeck.get(0).getWert();
+					derDealer.kartenBekommen++;
+					tfDKarten.setText(" " + derDealer.wertKarteOffen + " ");
+					dasDeck.remove(0);
+					dieGui.deckUpdate();
+				}
+				if (i == 1) {
+					derDealer.wertKarteGes += dasDeck.get(0).getWert();
+					derDealer.wertKarteVerdeckt = dasDeck.get(0).getWert();
+					derDealer.kartenBekommen++;
+					dasDeck.remove(0);
+					dieGui.deckUpdate();
+				}
+			} else {
+				initDeck();
+				i--;
 			}
 		}
 	}
 
 	public void hinzufuegenSpieler(String name, int geld) {
-		dieSpieler.add(new Spieler(id, name, geld));
-		id++;
+		for (int i = 0; i < dieGui.tfSpieler.size(); i++) {
+			dieSpieler.add(new Spieler(id, name, geld));
+			id++;
+		}
 	}
 
 	public void neueNutzer() {
@@ -314,12 +334,11 @@ public class Steuerung {
 				momentanerSpieler++;
 			else {
 				momentanerSpieler = 0;
-			austeilen(dieGui.tfSpielerKarten, dieGui.tfKartenWertD);
-			dieGui.state = "austeilen";
-			dieGui.setActionButtonEnable(true);
+				austeilen(dieGui.tfSpielerKarten, dieGui.tfKartenWertD);
+				dieGui.state = "austeilen";
+				dieGui.setActionButtonEnable(true);
 			}
-			
-				
+
 			dieGui.anzeigenGeld(dieSpieler.get(momentanerSpieler).geld);
 			dieGui.anzeigenMomSpieler();
 		}
@@ -332,30 +351,38 @@ public class Steuerung {
 	public void neueKarte() {
 		dieSpieler.get(momentanerSpieler).kartenWertGes += dasDeck.get(0).getWert();
 		dieSpieler.get(momentanerSpieler).kartenBekommen++;
+		if (dasDeck.get(0).getBezeichnung() == "Ass") {
+			dieSpieler.get(momentanerSpieler).assBekommen = true;
+			dieSpieler.get(momentanerSpieler).asseInsgesamt++;
+		}
 		dasDeck.remove(0);
 		anzeigenKarten();
 		dieGui.deckUpdate();
 
-		if (dieSpieler.get(momentanerSpieler).kartenWertGes > BLACKJACK) {
-			dieGui.tfStatusSpieler.get(momentanerSpieler).setText(busted);
-			momentanerSpieler++;
-			if (momentanerSpieler >= 4) {
-				momentanerSpieler = 0;
-				showDown();
+		if (dasDeck.size() != 0) {
+			if (dieSpieler.get(momentanerSpieler).kartenWertGes > BLACKJACK) {
+				dieGui.tfStatusSpieler.get(momentanerSpieler).setText(busted);
+				momentanerSpieler++;
+				if (momentanerSpieler >= 4) {
+					momentanerSpieler = 0;
+					showDown();
+				}
 			}
-		}
-		if (dieSpieler.get(momentanerSpieler).kartenWertGes == BLACKJACK) {
-			momentanerSpieler++;
-			if (momentanerSpieler >= 4) {
-				momentanerSpieler = 0;
-				showDown();
+			if (dieSpieler.get(momentanerSpieler).kartenWertGes == BLACKJACK) {
+				momentanerSpieler++;
+				if (momentanerSpieler >= 4) {
+					momentanerSpieler = 0;
+					showDown();
+				}
 			}
-		}
+		} else
+			initDeck();
+
 	}
 
 	public void doubleDown() {
 		if (dieSpieler.get(momentanerSpieler).doubleDown == false && momentanerSpieler < 4
-				&& dieSpieler.get(momentanerSpieler).kartenBekommen == 2) {
+				&& dieSpieler.get(momentanerSpieler).kartenBekommen == 2 && dieSpieler.get(momentanerSpieler).geld >= dieSpieler.get(momentanerSpieler).einsatz) {
 			setKarteDoubleDown();
 			dieSpieler.get(momentanerSpieler).doubleDown = true;
 			dieSpieler.get(momentanerSpieler).einsatz = dieSpieler.get(momentanerSpieler).einsatz * 2;

@@ -22,18 +22,18 @@ public class Karte {
 	private void setBezeichnung() {
 		switch (wert) {
 		case 1:
-			bezeichnung = "Ass "+farbe;
+			bezeichnung = "Ass";
 			break;
 		case 11:
-			bezeichnung = "Bube "+farbe;
+			bezeichnung = "Bube";
 			wert = 10;
 			break;
 		case 12:
-			bezeichnung = "Dame "+farbe;
+			bezeichnung = "Dame";
 			wert = 10;
 			break;
 		case 13:
-			bezeichnung = "Koenig "+farbe;
+			bezeichnung = "Koenig";
 			wert = 10;
 			break;
 		default:

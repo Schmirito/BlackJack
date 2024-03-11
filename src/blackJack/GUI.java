@@ -614,9 +614,9 @@ public class GUI {
 
 				if (spielStart) {
 
-					for (int i = 0; i < tfSpielerEinsatz.size(); i++) {
+					for (int i = 0; i < tfSpieler.size(); i++) {
 
-						String name = tfSpielerEinsatz.get(i).getText();
+						String name = tfSpieler.get(i).getText();
 						if (name != "Teilnehmen") {
 							dieSteuerung.hinzufuegenSpieler(name, dieSteuerung.STARTGELD);
 						} else if (name == "Teilnehmen") {
